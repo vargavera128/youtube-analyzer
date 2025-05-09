@@ -1,15 +1,13 @@
-
 require('dotenv').config();
-const Fastify = require('fastify');
+const fastify = require('fastify')({ logger: true });
+const youtubeRoutes = require('./routes/youtube.routes');
 
-const start = async () => {
-  try {
-    await fastify.listen({ port: 3000 });
-    console.log('Server running on http://localhost:3000');
-  } catch (err) {
+fastify.register(youtubeRoutes);
+
+fastify.listen({ port: 5000 }, (err, address) => {
+  if (err) {
     fastify.log.error(err);
     process.exit(1);
   }
-};
-
-start();
+  fastify.log.info(`Server listening at ${address}`);
+});
