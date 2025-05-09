@@ -14,10 +14,11 @@ Without the Python program this project will NOT work.
 # how to run
 
 1 - First, create a PostgreSQL database named "analyzer".
-2 - Then, run the Node.js application by executing the following command in your terminal: node index.js.
+2 - Execute the following command in your terminal to install dependencies: npm install
+3 - Then, run the Node.js application by executing the command: node index.js.
 The migration will run automatically, and you can confirm the successful creation of the necessary tables by checking the database.
-3 - Afterward, run the Python script (detailed instructions are provided in the Python repository's README file).
-4 - Finally, you can test the API endpoints using Postman, as described in the documentation.
+4 - Afterward, run the Python script (detailed instructions are provided in the Python repository's README file).
+5 - Finally, you can test the API endpoints using Postman, as described in the documentation.
 
 # note
 
