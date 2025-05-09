@@ -2,6 +2,7 @@ require('dotenv').config();
 const fastify = require('fastify')({ logger: true });
 const youtubeRoutes = require('./routes/youtube.routes');
 const commentRoutes = require('./routes/comments.routes');
+const videoRoutes = require('./routes/video.routes');
 const { knex } = require("./database");
 
 
@@ -30,6 +31,7 @@ const start = async () => {
 
   fastify.register(youtubeRoutes);
   fastify.register(commentRoutes);
+  fastify.register(videoRoutes);
 
 
   fastify.listen({ port: 5000 }, (err, address) => {
