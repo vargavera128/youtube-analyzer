@@ -1,57 +1,46 @@
-const toxicity = require('@tensorflow-models/toxicity');
-const tf = require('@tensorflow/tfjs');
+const axios = require("axios");
 const { knex } = require("../database");
 
-const loadModel = async () => {
-  const model = await toxicity.load(0.9);
-  return model;
-};
+const analyzeComments = async (comments, videoMetadata) => {
+  const response = await axios.post("http://localhost:8001/analyze", { comments });
+  const sentiments = response.data.results;
 
-const analyzeComments = async (comments, videoId, videoMetadata) => {
-  const model = await loadModel();
+  let positive = 0, neutral = 0, negative = 0;
   const results = [];
-  let positiveCount = 0;
-  let negativeCount = 0;
 
-  for (const text of comments) {
-    const predictions = await model.classify([text]);
-    const isToxic = predictions.some(pred => pred.results[0].match === true);
+  await knex("videos").insert({
+    video_id: videoMetadata.id,
+    video_name: videoMetadata.title,
+    video_creator: videoMetadata.channelTitle,
+    uploaded_at: videoMetadata.publishedAt,
+  });
 
-    const sentiment = isToxic ? 'negatív' : 'pozitív';
+  for (let i = 0; i < comments.length; i++) {
+    const text = comments[i];
+    const sentiment = sentiments[i];
 
-    if (isToxic) negativeCount++;
-    else positiveCount++;
-
-     const existing = await knex('videos').where({ video_id: videoId }).first();
-  if (!existing) {
-    await knex('videos').insert({
-      video_id: videoId,
-      video_name: videoMetadata.video_name,
-      video_creator: videoMetadata.video_creator,
-      uploaded_at: videoMetadata.uploaded_at
-    });
-  }
+    if (sentiment === "pozitív") positive++;
+    else if (sentiment === "semleges") neutral++;
+    else negative++;
 
     results.push({ text, sentiment });
 
-    await knex('comments').insert({
-      video_id: videoId,
+    await knex("comments").insert({
+      video_id: videoMetadata.id,
       text,
-      sentiment
+      sentiment,
     });
   }
-
- 
 
   return {
     summary: {
       total: comments.length,
-      pozitív: positiveCount,
-      negatív: negativeCount
+      pozitív: positive,
+      semleges: neutral,
+      negatív: negative
     },
     comments: results
   };
 };
-
 
 module.exports = { analyzeComments };

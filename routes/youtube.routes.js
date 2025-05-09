@@ -11,11 +11,9 @@ fastify.get('/analyze-comments', async (request, reply) => {
 
   try {
     const comments = await getComments(videoId);
-    const videoMetadata = await getVideoMetadata(videoId);
-
-    const analysisResults = await analyzeComments(comments, videoId, videoMetadata);
-
-    return reply.send(analysisResults);
+    const metadata = await getVideoMetadata(videoId);
+    const result = await analyzeComments(comments, metadata);
+    return reply.send(result);
   } catch (err) {
     fastify.log.error(err);
     return reply.code(500).send({ error: 'Error during analysis' });

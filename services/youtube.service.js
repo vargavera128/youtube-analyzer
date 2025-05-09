@@ -13,14 +13,16 @@ const getComments = async (videoId) => {
 const getVideoMetadata = async (videoId) => {
   const apiKey = process.env.YOUTUBE_API_KEY;
   const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${apiKey}`;
-  
   const response = await axios.get(url);
-  const snippet = response.data.items[0].snippet;
+
+  const item = response.data.items[0]?.snippet;
+  if (!item) throw new Error("No video metadata found");
 
   return {
-    video_name: snippet.title,
-    video_creator: snippet.channelTitle,
-    uploaded_at: snippet.publishedAt
+    id: videoId,
+    title: item.title,
+    channelTitle: item.channelTitle,
+    publishedAt: item.publishedAt,
   };
 };
 
